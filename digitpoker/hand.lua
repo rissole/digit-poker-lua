@@ -39,7 +39,7 @@ function Hand.score(hand)
 	local valueHighCard = function(hand)
 		local sum = 0
 		for i, rank in ipairs(hand) do
-			sum = sum + 11^(l-i) * (rank+1)
+			sum = sum + 11^(#hand-i) * (rank+1)
 		end
 		return sum
 	end
