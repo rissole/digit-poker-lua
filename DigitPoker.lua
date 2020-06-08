@@ -3,10 +3,10 @@
 -- card = numbers, 0-9.
 
 local MAJOR, MINOR = "DigitPoker-1.0", 0
-local DigitPoker = LibStub:NewLibrary(MAJOR, MINOR)
+local DigitPoker = LibStub and LibStub:NewLibrary(MAJOR, MINOR) or {}
 if not DigitPoker then return end
 
-function clone(T)
+local function clone(T)
     local u = { }
     for k, v in pairs(T) do u[k] = v end
     return setmetatable(u, getmetatable(T))
@@ -51,47 +51,47 @@ function DigitPoker.score(hand)
 
 	local valueFourOfAKind = function(hand)
 		local c = getCountsTable(hand)
-		local fourRank = findKey(c, 4)+1
-		local oneRank = findKey(c, 1)+1
-		return 11*fourRank + oneRank
+		local fourRank = findKey(c, 4)
+		local oneRank = findKey(c, 1)
+		return 11*(fourRank+1) + oneRank+1
 	end
 
 	local valueFullHouse = function(hand)
 		local c = getCountsTable(hand)
-		local threeRank = findKey(c, 3)+1
-		local twoRank = findKey(c, 2)+1
-		return 11*threeRank + twoRank
+		local threeRank = findKey(c, 3)
+		local twoRank = findKey(c, 2)
+		return 11*(threeRank+1) + twoRank+1
 	end
 
 	local valueThreeOfAKind = function(hand)
 		local c = getCountsTable(hand)
-		local threeRank = findKey(c, 3)+1
+		local threeRank = findKey(c, 3)
 		local handWithoutThreeRank = tableWithout(hand, threeRank)
 
-		return 11^3*threeRank + valueHighCard(handWithoutThreeRank)
+		return 11^3*(threeRank+1) + valueHighCard(handWithoutThreeRank)
 	end
 
 	local valueTwoPair = function(hand)
 		local c = getCountsTable(hand)
-		local lowPair = findKey(c, 2)+1
-		c[lowPair-1] = 0
-		local highPair = findKey(c, 2)+1
-		local singleRank = findKey(c, 1)+1
+		local lowPair = findKey(c, 2)
+		c[lowPair] = 0
+		local highPair = findKey(c, 2)
+		local singleRank = findKey(c, 1)
 		if (lowPair > highPair) then
 			local x = lowPair
 			lowPair = highPair
 			highPair = x
 		end
 
-		return 11^3*highPair + 11^2*lowPair + singleRank
+		return 11^3*(highPair+1) + 11^2*(lowPair+1) + singleRank+1
 	end
 
 	local valuePair = function(hand)
 		local c = getCountsTable(hand)
-		local pairRank = findKey(c, 2)+1
+		local pairRank = findKey(c, 2)
 		local handWithoutPairRank = tableWithout(hand, pairRank)
 
-		return 11^4*pairRank + valueHighCard(handWithoutPairRank)
+		return 11^4*(pairRank+1) + valueHighCard(handWithoutPairRank)
 	end
 
 	local getBaseValue = function(i)
@@ -259,3 +259,5 @@ function DigitPoker.isPair(hand)
 
 	return numPairs == 1
 end
+
+return DigitPoker

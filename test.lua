@@ -1,5 +1,4 @@
-local Hand = require('digitpoker.hand')
-local inspect = require('inspect')
+local Hand = require('digitpoker')
 
 assert(Hand.score(Hand.parse('52938')) == (11^4*10 + 11^3*9 + 11^2*6 + 11^1*4 + 11^0*3));
 
@@ -73,3 +72,40 @@ print(Hand.name(Hand.parse('77712')))
 print(Hand.name(Hand.parse('00099')))
 print(Hand.name(Hand.parse('88881')))
 print(Hand.name(Hand.parse('74586')))
+
+-- generate all possible 2 pair hands
+local lastHand
+for p1=9,0,-1 do
+	for p2=9,0,-1 do
+		if (p1 <= p2) then goto p2continue end
+		for r=9,0,-1 do
+			if (p1 == r or p2 == r) then goto rcontinue end
+			local hand = {p1, p1, p2, p2, r}
+			if (lastHand) then
+				assert(Hand.score(hand) < Hand.score(lastHand), Hand.formatHand(hand) .. ' > ' .. Hand.formatHand(lastHand))
+			end
+			lastHand = hand
+			::rcontinue::
+		end
+		::p2continue::
+	end
+end
+
+-- generate all possible pair hands
+lastHand = nil
+for p1=9,0,-1 do
+	for r1=9,0,-1 do
+		for r2=9,0,-1 do
+			for r3=9,0,-1 do
+				if (p1 == r1 or p1 == r2 or p1 == r3 or r1 == r2 or r1 == r3 or r1 == r3
+					or r1 <= r2 or r2 <= r3) then goto rcontinue end
+				local hand = {p1, p1, r1, r2, r3}
+				if (lastHand) then
+					assert(Hand.score(hand) < Hand.score(lastHand), Hand.formatHand(hand) .. ' > ' .. Hand.formatHand(lastHand))
+				end
+				lastHand = hand
+				::rcontinue::
+			end
+		end
+	end
+end
